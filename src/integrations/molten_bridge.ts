@@ -2,7 +2,7 @@
 // description: Bridge for syncing ClawKeeper memories to Molten unified memory system
 // reference: src/memory/index.ts, Molten core/memory-api.js
 
-const MOLTEN_API_URL = process.env.MOLTEN_MEMORY_API_URL || 'http://localhost:3000/api/memories';
+const MOLTEN_API_URL = process.env.MOLTEN_MEMORY_API_URL || 'http://localhost:18789/api/memories';
 const TIMEOUT_MS = 10000;
 const SYNC_ENABLED = process.env.MOLTEN_SYNC_ENABLED === 'true';
 

@@ -3,9 +3,11 @@
 // reference: CLAUDE.md, package.json
 
 import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
 
 export default [
   js.configs.recommended,
+  ...tseslint.configs.recommended,
   {
     files: ['src/**/*.ts', 'src/**/*.js'],
     languageOptions: {
@@ -19,19 +21,17 @@ export default [
     },
     rules: {
       // Naming conventions
-      'camelcase': ['error', {
-        properties: 'never',
-        ignoreDestructuring: false,
-        ignoreImports: false,
-        ignoreGlobals: false,
-        allow: ['^UNSAFE_', '^[A-Z]+_[A-Z]+$'], // Allow SCREAMING_SNAKE_CASE for constants
-      }],
+      // ClawKeeper uses snake_case by convention (see CLAUDE.md)
+      'camelcase': 'off',
       
-      // Code quality
-      'no-unused-vars': ['warn', {
+      // Code quality - use TS-aware version
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', {
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
       }],
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
       'no-console': 'off', // We use console for logging
       'prefer-const': 'error',
       'no-var': 'error',
@@ -39,7 +39,7 @@ export default [
       // Best practices
       'eqeqeq': ['error', 'always'],
       'no-throw-literal': 'error',
-      'no-return-await': 'error',
+      'no-return-await': 'off', // Deprecated; return await is valid in try/catch
       
       // TypeScript-specific (handled by tsc)
       'no-undef': 'off', // TypeScript handles this

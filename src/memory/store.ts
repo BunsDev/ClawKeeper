@@ -1,9 +1,10 @@
 // file: src/memory/store.ts
-// description: PostgreSQL-backed memory store with tenant isolation
-// reference: src/memory/types.ts, src/api/routes/invoices.ts
+// description: PostgreSQL-backed memory store with tenant isolation and pgvector semantic search
+// reference: src/memory/types.ts, src/memory/embedding_service.ts, src/api/routes/invoices.ts
 
 import type { Sql } from 'postgres';
 import { v4 as uuid } from 'uuid';
+import { create_embedding_service, type IEmbeddingService } from './embedding_service';
 import type {
   MemoryEntry,
   MemoryId,
@@ -41,9 +42,68 @@ interface MemoryRow {
 
 export class MemoryStore {
   private sql: Sql;
+  private embedding_service: IEmbeddingService;
 
   constructor(sql: Sql) {
     this.sql = sql;
+    this.embedding_service = create_embedding_service();
+  }
+
+  /**
+   * Generate and store embedding for text content
+   */
+  private async generate_and_store_embedding(memory_id: string, content: MemoryContent): Promise<void> {
+    try {
+      // Extract text from content for embedding
+      const text_to_embed = this.extract_text_from_content(content);
+      
+      if (text_to_embed && text_to_embed.length > 0) {
+        const embedding = await this.embedding_service.generate(text_to_embed);
+        
+        // Update memory with embedding
+        await this.sql`
+          UPDATE memories
+          SET embedding = ${JSON.stringify(embedding)}::vector
+          WHERE id = ${memory_id}
+        `;
+        
+        console.log(`[Memory] Generated embedding for memory ${memory_id}`);
+      }
+    } catch (error) {
+      // Log but don't fail the save operation
+      console.error(`[Memory] Failed to generate embedding for ${memory_id}:`, error);
+    }
+  }
+
+  /**
+   * Extract searchable text from memory content
+   */
+  private extract_text_from_content(content: MemoryContent): string {
+    if (typeof content === 'string') {
+      return content;
+    }
+    
+    if (typeof content === 'object' && content !== null) {
+      // Extract text fields from object content
+      const text_parts: string[] = [];
+      
+      if ('text' in content && typeof content.text === 'string') {
+        text_parts.push(content.text);
+      }
+      if ('title' in content && typeof content.title === 'string') {
+        text_parts.push(content.title);
+      }
+      if ('description' in content && typeof content.description === 'string') {
+        text_parts.push(content.description);
+      }
+      if ('summary' in content && typeof content.summary === 'string') {
+        text_parts.push(content.summary);
+      }
+      
+      return text_parts.join(' ').trim();
+    }
+    
+    return '';
   }
 
   /**
@@ -64,7 +124,7 @@ export class MemoryStore {
   }
 
   /**
-   * Save a new memory entry with tenant isolation
+   * Save a new memory entry with tenant isolation and embedding generation
    */
   async saveMemory(tenantId: string, input: CreateMemoryInput): Promise<MemoryEntry> {
     const id = uuid();
@@ -93,6 +153,11 @@ export class MemoryStore {
       )
       RETURNING *
     `;
+
+    // Generate and store embedding asynchronously (don't block the response)
+    this.generate_and_store_embedding(id, input.content).catch((err) => {
+      console.error('[Memory] Embedding generation failed:', err);
+    });
 
     return this.rowToEntry(row);
   }
@@ -455,6 +520,122 @@ export class MemoryStore {
     }
     
     return highlights;
+  }
+
+  /**
+   * Semantic search using pgvector hybrid approach
+   * Combines vector similarity with text search and merges results
+   */
+  async semanticSearch(
+    tenantId: string,
+    queryText: string,
+    options: {
+      limit?: number;
+      agentIds?: string[];
+      types?: MemoryType[];
+      minSimilarity?: number;
+    } = {}
+  ): Promise<MemorySearchResult[]> {
+    const { limit = 20, agentIds, types, minSimilarity = 0.7 } = options;
+
+    try {
+      // Generate embedding for query
+      const queryEmbedding = await this.embedding_service.generate(queryText);
+
+      // Build filter conditions
+      const filters: string[] = [`tenant_id = '${tenantId}'`, 'deleted_at IS NULL', 'embedding IS NOT NULL'];
+      
+      if (agentIds && agentIds.length > 0) {
+        const agentList = agentIds.map(a => `'${a}'`).join(', ');
+        filters.push(`agent_id IN (${agentList})`);
+      }
+      
+      if (types && types.length > 0) {
+        const typeList = types.map(t => `'${t}'`).join(', ');
+        filters.push(`type IN (${typeList})`);
+      }
+
+      const whereClause = filters.join(' AND ');
+
+      // Vector similarity search using cosine distance
+      const vectorResults = await this.sql<(MemoryRow & { similarity: number })[]>`
+        SELECT 
+          *,
+          1 - (embedding <=> ${JSON.stringify(queryEmbedding)}::vector) as similarity
+        FROM memories
+        WHERE ${this.sql.unsafe(whereClause)}
+          AND 1 - (embedding <=> ${JSON.stringify(queryEmbedding)}::vector) >= ${minSimilarity}
+        ORDER BY similarity DESC
+        LIMIT ${limit}
+      `;
+
+      // Text search fallback
+      const textResults = await this.sql<MemoryRow[]>`
+        SELECT *
+        FROM memories
+        WHERE ${this.sql.unsafe(whereClause.replace('embedding IS NOT NULL', '1=1'))}
+          AND (
+            content::text ILIKE ${'%' + queryText + '%'}
+            OR metadata::text ILIKE ${'%' + queryText + '%'}
+          )
+        LIMIT ${Math.floor(limit / 2)}
+      `;
+
+      // Merge and deduplicate
+      const seenIds = new Set<string>();
+      const merged: MemorySearchResult[] = [];
+
+      for (const row of vectorResults) {
+        if (!seenIds.has(row.id)) {
+          merged.push({
+            entry: this.rowToEntry(row),
+            score: row.similarity,
+            highlights: [],
+          });
+          seenIds.add(row.id);
+        }
+      }
+
+      for (const row of textResults) {
+        if (!seenIds.has(row.id)) {
+          const contentText = typeof row.content === 'string' ? row.content : JSON.stringify(row.content);
+          merged.push({
+            entry: this.rowToEntry(row),
+            score: 0.5,
+            highlights: this.extractHighlights(contentText, queryText),
+          });
+          seenIds.add(row.id);
+        }
+      }
+
+      console.log(`[Memory] Hybrid search: ${merged.length} results (${vectorResults.length} semantic, ${textResults.length} keyword)`);
+
+      return merged.slice(0, limit);
+    } catch (error) {
+      console.error('[Memory] Semantic search failed, falling back to text search:', error);
+      
+      // Graceful fallback
+      const fallbackResults = await this.sql<MemoryRow[]>`
+        SELECT *
+        FROM memories
+        WHERE tenant_id = ${tenantId}
+          AND deleted_at IS NULL
+          AND (
+            content::text ILIKE ${'%' + queryText + '%'}
+            OR metadata::text ILIKE ${'%' + queryText + '%'}
+          )
+        LIMIT ${limit}
+      `;
+
+      return fallbackResults.map(row => {
+        const contentText = typeof row.content === 'string' ? row.content : JSON.stringify(row.content);
+        return {
+          entry: this.rowToEntry(row),
+          score: 0.5,
+          highlights: this.extractHighlights(contentText, queryText),
+        };
+      });
+    }
   }
 }
 

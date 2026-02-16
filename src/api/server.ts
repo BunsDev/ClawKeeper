@@ -19,6 +19,7 @@ import { create_activity_routes } from './routes/activity';
 import { create_vendor_routes } from './routes/vendors';
 import { create_customer_routes } from './routes/customers';
 import { create_metrics_routes } from './routes/metrics';
+import { websocket_handler } from './websocket_handler';
 import type { AppEnv } from '../types/hono';
 
 // Database connection
@@ -117,13 +118,14 @@ app.route('/api/vendors', create_vendor_routes(sql));
 app.route('/api/customers', create_customer_routes(sql));
 app.route('/api/metrics', create_metrics_routes(sql));
 
-// WebSocket endpoint (NOT IMPLEMENTED)
+// WebSocket endpoint
 app.get('/ws', (c) => {
-  // TODO: Implement WebSocket support for real-time agent updates
+  // Return upgrade info for HTTP GET (browser compatibility)
   return c.json({
-    error: 'WebSocket not yet implemented',
-    message: 'This endpoint will provide real-time agent status updates',
-  }, 501);
+    message: 'WebSocket endpoint ready',
+    usage: 'Upgrade this connection to WebSocket protocol',
+    stats: websocket_handler.get_stats(),
+  });
 });
 
 // Start server
@@ -152,4 +154,13 @@ Ready for requests...
 export default {
   port,
   fetch: app.fetch,
+  websocket: {
+    open: websocket_handler.open.bind(websocket_handler),
+    message: websocket_handler.message.bind(websocket_handler),
+    close: websocket_handler.close.bind(websocket_handler),
+    error: websocket_handler.error.bind(websocket_handler),
+  },
 };
+
+// Export websocket handler for use in agents
+export { websocket_handler, emit_agent_status } from './websocket_handler';

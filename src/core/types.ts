@@ -270,20 +270,24 @@ export type AuditEntry = z.infer<typeof AuditEntry>;
 // Agent Types (extends orcaflow)
 // ============================================================================
 
-export const LedgerAgentId = z.enum([
-  // CEO
-  'clawkeeper',
-  // Orchestrators
-  'cfo',
-  'accounts_payable_lead',
-  'accounts_receivable_lead',
-  'reconciliation_lead',
-  'compliance_lead',
-  'reporting_lead',
-  'integration_lead',
-  'data_etl_lead',
-  'support_lead',
-  // Workers will be added dynamically
+// Union type that accepts known orchestrators OR any snake_case worker agent ID
+export const LedgerAgentId = z.union([
+  z.enum([
+    // CEO
+    'clawkeeper',
+    // Orchestrators
+    'cfo',
+    'accounts_payable_lead',
+    'accounts_receivable_lead',
+    'reconciliation_lead',
+    'compliance_lead',
+    'reporting_lead',
+    'integration_lead',
+    'data_etl_lead',
+    'support_lead',
+  ]),
+  // Worker agents: any snake_case identifier
+  z.string().regex(/^[a-z][a-z0-9_]*$/, 'Worker agent IDs must be snake_case'),
 ]);
 export type LedgerAgentId = z.infer<typeof LedgerAgentId>;
 

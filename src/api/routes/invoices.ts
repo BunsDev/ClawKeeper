@@ -6,6 +6,7 @@ import { Hono } from 'hono';
 import type { Sql } from 'postgres';
 import { v4 as uuid } from 'uuid';
 import type { AppEnv } from '../../types/hono';
+import { create_ocr_service } from '../../services/ocr_service';
 
 export function invoice_routes(sql: Sql<Record<string, unknown>>) {
   const app = new Hono<AppEnv>();
@@ -45,13 +46,102 @@ export function invoice_routes(sql: Sql<Record<string, unknown>>) {
     }
   });
 
-  // Upload invoice for processing (NOT IMPLEMENTED)
+  // Upload invoice for processing with OCR
   app.post('/upload', async (c) => {
-    // TODO: Implement file upload with Document AI OCR processing
-    return c.json({
-      error: 'Invoice upload not yet implemented',
-      message: 'This endpoint will support OCR and automatic invoice processing',
-    }, 501);
+    try {
+      const tenant = c.get('tenant');
+      if (!tenant) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      // Parse multipart form data
+      const body = await c.req.parseBody();
+      const file = body.file;
+
+      if (!file || typeof file === 'string') {
+        return c.json({ error: 'No file uploaded' }, 400);
+      }
+
+      // Validate file type
+      const allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+      if (!allowed_types.includes(file.type)) {
+        return c.json({
+          error: 'Invalid file type',
+          message: `Supported types: ${allowed_types.join(', ')}`,
+        }, 400);
+      }
+
+      // Validate file size (max 10MB)
+      const max_size = 10 * 1024 * 1024;
+      if (file.size > max_size) {
+        return c.json({
+          error: 'File too large',
+          message: 'Maximum file size: 10MB',
+        }, 400);
+      }
+
+      // Read file buffer
+      const buffer = Buffer.from(await file.arrayBuffer());
+
+      // Extract invoice data using OCR
+      const ocr_service = create_ocr_service();
+      const extracted = await ocr_service.extract_invoice_data(buffer, file.type);
+
+      // Insert invoice into database
+      const [invoice] = await sql`
+        INSERT INTO invoices (
+          tenant_id,
+          vendor_name,
+          invoice_number,
+          invoice_date,
+          due_date,
+          subtotal,
+          tax,
+          total,
+          currency,
+          status,
+          ocr_confidence,
+          line_items
+        ) VALUES (
+          ${tenant.id},
+          ${extracted.vendor_name},
+          ${extracted.invoice_number},
+          ${extracted.date},
+          ${extracted.due_date},
+          ${extracted.subtotal},
+          ${extracted.tax},
+          ${extracted.total},
+          ${extracted.currency},
+          ${extracted.confidence >= 0.8 ? 'pending_approval' : 'needs_review'},
+          ${extracted.confidence},
+          ${JSON.stringify(extracted.line_items)}
+        )
+        RETURNING *
+      `;
+
+      console.log(`[Invoice Upload] Created invoice ${invoice.id} for tenant ${tenant.id}`);
+
+      return c.json({
+        message: 'Invoice uploaded and processed',
+        invoice: {
+          id: invoice.id,
+          vendor_name: invoice.vendor_name,
+          invoice_number: invoice.invoice_number,
+          total: invoice.total,
+          currency: invoice.currency,
+          status: invoice.status,
+          confidence: invoice.ocr_confidence,
+          requires_review: extracted.confidence < 0.8,
+        },
+        extracted_data: extracted,
+      }, 201);
+    } catch (error) {
+      console.error('[Invoice Upload] Error:', error);
+      return c.json({
+        error: 'Failed to process invoice',
+        message: String(error),
+      }, 500);
+    }
   });
 
   // Approve invoice
