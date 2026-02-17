@@ -135,6 +135,33 @@ ClawKeeper/
 - **Input Validation** - Zod schemas for all API inputs
 - **PII Detection** - Prevents sensitive data leakage to LLMs
 
+## 🔗 Cross-Repo Integration
+
+### Molten Memory Sync (Optional)
+
+ClawKeeper can optionally sync important memories to the TechTide unified memory system (Molten) for cross-agent knowledge sharing.
+
+**Enable Memory Sync:**
+```bash
+# In .env
+MOLTEN_SYNC_ENABLED=true
+MOLTEN_MEMORY_API_URL=http://localhost:18789/api/memories
+MOLTEN_GATEWAY_URL=http://localhost:18789
+```
+
+**What Gets Synced:**
+- Only memories with `importance >= 7` (out of 10) are synced
+- Fire-and-forget pattern - failures don't break ClawKeeper
+- Synced to tenant-specific namespace: `clawkeeper:{tenant_id}`
+- Tier mapping: importance 8+ → long_term, 7 → short_term
+
+**Implementation:**
+See `src/integrations/molten_bridge.ts` for the sync adapter.
+
+**Default:** Disabled (`MOLTEN_SYNC_ENABLED=false`)
+
+---
+
 ## 🎯 Deployment
 
 Runs as independent CEO agent:
