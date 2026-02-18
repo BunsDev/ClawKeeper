@@ -73,5 +73,3 @@ tenants.json
 .cursor/
 *.plan.md
 
-# User-uploaded assets
-assets/
