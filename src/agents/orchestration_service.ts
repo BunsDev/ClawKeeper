@@ -5,6 +5,7 @@
 import { v4 as uuid } from 'uuid';
 import { agent_runtime } from './index';
 import * as llm from '../core/llm-client';
+import { sync_to_molten } from '../integrations/molten_bridge';
 import type { LedgerTaskStar, LedgerCapability, LedgerAgentId, TenantContext } from '../core/types';
 
 // ============================================================================
@@ -347,6 +348,18 @@ class OrchestrationService {
         summary,
         timestamp: new Date().toISOString(),
       });
+
+      // Sync plan summary to Molten memory (fire-and-forget)
+      const tenant_id = tenant_context?.tenant_id;
+      if (tenant_id) {
+        sync_to_molten(
+          'clawkeeper',
+          tenant_id,
+          `Orchestration plan ${plan_id}: ${plan.command}. ${summary}`,
+          'context',
+          8,
+        ).catch(() => {});
+      }
 
       return {
         plan_id,

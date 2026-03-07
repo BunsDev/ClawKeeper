@@ -44,8 +44,8 @@ ClawKeeper CEO
 
 ### Default Ports
 
-- **API Server:** 9100
-- **Dashboard:** 3000  
+- **API Server:** 4004 (TechTide ecosystem; set `PORT` to override)
+- **Dashboard:** 3000 (when running standalone)
 - **PostgreSQL:** 5432
 
 ### 1. Clone and Install
@@ -158,7 +158,7 @@ MOLTEN_GATEWAY_URL=http://localhost:18789
 **Implementation:**
 See `src/integrations/molten_bridge.ts` for the sync adapter.
 
-**Default:** Disabled (`MOLTEN_SYNC_ENABLED=false`)
+**Default:** Enabled; set `MOLTEN_SYNC_ENABLED=false` to disable. Status: `GET /api/admin/molten-sync`
 
 ---
 
@@ -188,6 +188,9 @@ Runs as independent CEO agent:
 ### Reconciliation
 - `POST /api/reconciliation/start` - Start reconciliation task
 - `GET /api/reconciliation/:id/status` - Check status
+
+### Admin & Integration
+- `GET /api/admin/molten-sync` - Molten sync status (`{ enabled: boolean }`)
 
 ### Real-Time
 - `WS /ws` - WebSocket for live updates

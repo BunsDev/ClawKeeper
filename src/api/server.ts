@@ -19,6 +19,7 @@ import { create_activity_routes } from './routes/activity';
 import { create_vendor_routes } from './routes/vendors';
 import { create_customer_routes } from './routes/customers';
 import { create_metrics_routes } from './routes/metrics';
+import { admin_routes } from './routes/admin';
 import { websocket_handler } from './websocket_handler';
 import type { AppEnv } from '../types/hono';
 
@@ -44,7 +45,7 @@ app.use('/api/*', async (c, next) => {
   
   if (!auth_header || !auth_header.startsWith('Bearer ')) {
     // Skip for public endpoints
-    if (c.req.path === '/api/auth/login' || c.req.path === '/api/health' || c.req.path === '/api/agents/status') {
+    if (c.req.path === '/api/auth/login' || c.req.path === '/api/health' || c.req.path === '/api/agents/status' || c.req.path === '/api/admin/molten-sync') {
       return next();
     }
     
@@ -117,6 +118,7 @@ app.route('/api/activity', create_activity_routes(sql));
 app.route('/api/vendors', create_vendor_routes(sql));
 app.route('/api/customers', create_customer_routes(sql));
 app.route('/api/metrics', create_metrics_routes(sql));
+app.route('/api/admin', admin_routes());
 
 // WebSocket endpoint
 app.get('/ws', (c) => {

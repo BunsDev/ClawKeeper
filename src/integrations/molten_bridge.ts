@@ -4,7 +4,8 @@
 
 const MOLTEN_API_URL = process.env.MOLTEN_MEMORY_API_URL || 'http://localhost:18789/api/memories';
 const TIMEOUT_MS = 10000;
-const SYNC_ENABLED = process.env.MOLTEN_SYNC_ENABLED === 'true';
+/** Enabled by default; set MOLTEN_SYNC_ENABLED=false to disable. */
+export const MOLTEN_SYNC_ENABLED = process.env.MOLTEN_SYNC_ENABLED !== 'false';
 
 // ClawKeeper type -> Molten type mapping
 const TYPE_MAP: Record<string, string> = {
@@ -26,7 +27,7 @@ export async function sync_to_molten(
   type: string,
   importance: number = 5,
 ): Promise<string | null> {
-  if (!SYNC_ENABLED) return null;
+  if (!MOLTEN_SYNC_ENABLED) return null;
   if (importance < 7) return null; // Only sync important memories
 
   try {
@@ -79,7 +80,7 @@ export async function recall_from_molten(
   tenant_id: string,
   limit: number = 5,
 ): Promise<Array<{ content: string; score: number }>> {
-  if (!SYNC_ENABLED) return [];
+  if (!MOLTEN_SYNC_ENABLED) return [];
 
   try {
     const params = new URLSearchParams({
