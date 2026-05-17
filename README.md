@@ -4,17 +4,17 @@
 
 # ClawKeeper
 
-### Your AI Bookkeeper That Never Sleeps
+### The OpenClaw-native finance operating system for SMBs
 
-**110 autonomous AI agents working 24/7 so you never touch a spreadsheet again.**
+**ClawKeeper turns the finance arm of a small business into an agent-run operation: invoices, reconciliation, reporting, compliance, integrations, and payment workflows coordinated through an OpenClaw-style agent control plane.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Built with Bun](https://img.shields.io/badge/Built%20with-Bun-f9f1e1?logo=bun)](https://bun.sh)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18-61dafb?logo=react)](https://react.dev)
-[![DeepSeek AI](https://img.shields.io/badge/Powered%20by-DeepSeek%20AI-4f46e5)](https://deepseek.com)
+[![Version](https://img.shields.io/badge/release-v1.5.0-16a34a)](docs/RELEASE_1_5.md)
+[![OpenClaw Native](https://img.shields.io/badge/OpenClaw-native-16a34a)](https://github.com/openclaw/openclaw)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178c6?logo=typescript)](https://www.typescriptlang.org/)
+[![Quality Gate](https://img.shields.io/badge/quality-typecheck%20%7C%20lint%20%7C%20test-16a34a)](.github/workflows/quality.yml)
 
-[Quick Start](#-quick-start) · [Architecture](#-architecture) · [Features](#-features) · [API Docs](#-api-reference) · [Contributing](CONTRIBUTING.md)
+[Quick Start](#quick-start) · [Agent Architecture](#agent-architecture) · [Security Model](#security-model) · [Testing](#testing-and-quality-gates) · [API](#api-surface) · [Docs](#documentation)
 
 ---
 
@@ -22,314 +22,198 @@
 
 </div>
 
-## The Problem
+## Why ClawKeeper exists
 
-Small and medium businesses spend **120+ hours per year** on bookkeeping. Manual invoice processing, bank reconciliation, and financial reporting drain time, money, and sanity. Hiring a full-time bookkeeper costs $45K–$65K/year. Outsourcing to a firm? $500–$2,500/month.
+Most SMB finance teams do not need another dashboard; they need the work to happen. ClawKeeper is built around that premise. The product is a **full-stack agent application** where a CEO finance agent coordinates domain leads and specialized workers across accounts payable, accounts receivable, reconciliation, reporting, compliance, integrations, ETL, and support. The dashboard remains important, but the center of gravity in v1.5 is the backend agent infrastructure: deterministic policy checks, auditable execution, tenant-aware boundaries, and an OpenClaw-native manifest that defines how finance agents are allowed to operate.
 
-## The Solution
+> ClawKeeper v1.5 is the transition from “AI bookkeeping dashboard” to **OpenClaw agent infrastructure for SMB financial operations**.
 
-ClawKeeper deploys a **full AI accounting department** — a CEO agent that orchestrates 9 team leads and 100 specialized workers — to handle your entire bookkeeping operation autonomously. One natural language command. 110 agents. Zero spreadsheets.
-
-> *"Generate monthly P&L report and reconcile all accounts"*
->
-> That's it. ClawKeeper's CEO agent decomposes the task, delegates to the right teams, and delivers results in real-time.
-
----
-
-## Why ClawKeeper?
-
-| Feature | Traditional | ClawKeeper |
-|---|---|---|
-| **Invoice Processing** | Manual entry, 5–10 min each | AI OCR + auto-categorization in seconds |
-| **Bank Reconciliation** | Hours of matching transactions | Automatic matching with discrepancy detection |
-| **Financial Reports** | Days to compile | Generated on-demand, any time |
-| **Cost** | $45K–$65K/year (in-house) | Self-hosted, pay only for AI inference |
-| **Availability** | Business hours | 24/7/365 |
-| **Multi-Tenant** | One client at a time | Unlimited tenants, full data isolation |
-
----
-
-## Features
-
-- **One-Prompt Deployment** — Deploy 110 AI agents with a single natural language command
-- **Autonomous Invoice Processing** — AI-powered OCR via Google Document AI, validation, and categorization
-- **Bank Reconciliation** — Automatic transaction matching and discrepancy detection via Plaid
-- **Financial Reporting** — P&L, Balance Sheet, Cash Flow, AP/AR Aging, and custom reports
-- **Multi-Tenant Architecture** — Complete tenant isolation with Row-Level Security and RBAC
-- **110-Agent Hierarchy** — CEO + 9 orchestrators + 100 specialized workers
-- **DeepSeek AI Integration** — Cost-efficient AI reasoning (10–100x cheaper than GPT-4)
-- **Real-Time Execution Streaming** — Watch agents collaborate live via WebSocket + SSE
-- **Production Security** — Rate limiting, circuit breakers, PII detection, audit trails
-- **Modern Dashboard** — React + Vite + Tailwind + Shadcn with Command Center UI
-
----
-
-## Architecture
-
-<div align="center">
-<img src="assets/architecture.png" alt="ClawKeeper Architecture" width="100%" />
-</div>
-
-ClawKeeper follows a **hierarchical multi-agent architecture** inspired by how real accounting departments operate:
-
-```
-ClawKeeper CEO (Top-Level Orchestrator)
-│
-├── CFO Agent ──────────────── 8 workers  (Strategic planning, forecasting, budgeting)
-├── Accounts Payable Lead ──── 15 workers (Invoice processing, payments, expense tracking)
-├── Accounts Receivable Lead ─ 15 workers (Customer invoicing, collections, revenue tracking)
-├── Reconciliation Lead ────── 12 workers (Bank matching, discrepancy resolution)
-├── Compliance Lead ─────────── 10 workers (Tax compliance, audit preparation)
-├── Reporting Lead ──────────── 12 workers (Financial reports, dashboards, analytics)
-├── Integration Lead ────────── 12 workers (Plaid, Stripe, QuickBooks, Xero sync)
-├── Data/ETL Lead ───────────── 10 workers (Data import, transformation, validation)
-└── Support Lead ────────────── 6 workers  (User assistance, error recovery)
-```
-
-### Tech Stack
-
-| Layer | Technology |
+| Repository maturity axis | v1.5 state |
 |---|---|
-| **Runtime** | Bun |
-| **Language** | TypeScript (strict mode) |
-| **API Server** | Hono |
-| **Dashboard** | React 18 + Vite + Tailwind CSS + Shadcn/UI |
-| **Database** | PostgreSQL with RLS + RBAC |
-| **AI Engine** | DeepSeek AI |
-| **OCR** | Google Document AI |
-| **Banking** | Plaid |
-| **Payments** | Stripe |
-| **Accounting Sync** | QuickBooks, Xero |
-| **Real-Time** | WebSocket + Server-Sent Events |
+| **Agent identity** | OpenClaw-native application manifest in `src/openclaw/manifest.ts` defines runtime, agents, capabilities, approval policy, and observability contracts. |
+| **Execution guardrails** | `BaseAgent` now evaluates the OpenClaw finance policy before task execution and emits redacted policy audit events. |
+| **Finance safety** | Money movement, accounting-system writes, tax workflows, and destructive actions are approval-gated or denied when capability, tenant, or prompt-safety checks fail. |
+| **Backend surface** | Agent API routes expose manifest and dry-run policy evaluation endpoints for inspecting the control plane before execution. |
+| **Testing** | Node-compatible TypeScript tests cover manifest integrity, runtime adapter health, approvals, tenant isolation, missing capabilities, prompt-injection denial, and audit redaction. |
+| **Quality gate** | `npm run quality` runs TypeScript checking, ESLint, and the v1.5 test suite; CI mirrors the same checks and adds `npm audit`. |
 
----
+## What ClawKeeper runs
+
+ClawKeeper models the finance department as a hierarchy of OpenClaw agents. The top-level CEO agent decomposes work, the finance leads own operational domains, and worker agents handle specialized tasks. The v1.5 runtime policy layer makes those agents safer by moving critical decisions out of prompts and into deterministic code.
+
+```text
+ClawKeeper CEO Agent
+│
+├── CFO Lead                  strategic finance, budgets, forecasting
+├── Accounts Payable Lead      invoices, approvals, disbursements
+├── Accounts Receivable Lead   billing, collections, revenue operations
+├── Reconciliation Lead        bank matching, exception review
+├── Compliance Lead            tax posture, audit preparation, controls
+├── Reporting Lead             P&L, cash flow, balance sheet, KPIs
+├── Integration Lead           Plaid, Stripe, QuickBooks, Xero, Document AI
+├── Data / ETL Lead            imports, normalization, validation
+└── Support Lead               user support, recovery, human handoff
+```
+
+| Layer | Implementation |
+|---|---|
+| **Agent runtime** | TypeScript agent classes in `src/agents`, OpenClaw application contract in `src/openclaw`, runtime adapter in `src/openclaw/runtime.ts`. |
+| **API** | Hono API server with agent, invoice, report, reconciliation, auth, and health routes. |
+| **Dashboard** | React/Vite/Tailwind command center for SMB operators and finance reviewers. |
+| **Persistence** | PostgreSQL schema, RLS, RBAC, seed data, and tenant-aware backend types. |
+| **AI provider path** | OpenAI-compatible LLM client abstraction with cost-sensitive configuration and prompt-safety guardrails. |
+| **Finance integrations** | Plaid, Stripe, QuickBooks, Xero, and document-processing integration clients. |
+| **Security controls** | Zod validation, PII detection, prompt-injection detection, rate limiting, audit logging, tenant isolation, approval gates, and CI checks. |
+
+## OpenClaw-native v1.5 control plane
+
+ClawKeeper v1.5 introduces a dedicated OpenClaw module rather than leaving the agent system as UI-driven TypeScript glue. The manifest defines ClawKeeper as an **OpenClaw finance-agent application**, and the policy engine makes execution decisions before an agent touches a high-risk finance workflow.
+
+| File | Purpose |
+|---|---|
+| `src/openclaw/manifest.ts` | Declares ClawKeeper’s OpenClaw app metadata, finance agents, capabilities, runtime boundaries, risk tiers, approval rules, and audit stream. |
+| `src/openclaw/policy.ts` | Implements deterministic pre-execution policy evaluation for tenant isolation, role/capability checks, prompt-injection denial, amount thresholds, and approval requirements. |
+| `src/openclaw/runtime.ts` | Provides the runtime adapter boundary for OpenClaw gateway metadata, manifest health, agent lookup, and guarded execution. |
+| `src/agents/base.ts` | Enforces the policy engine for every agent task before execution and records redacted audit metadata. |
+| `src/api/routes/agents.ts` | Exposes agent status, OpenClaw manifest inspection, and dry-run policy evaluation routes. |
+
+The policy layer is deliberately deterministic. It does not ask an LLM whether a payment, writeback, or tenant-crossing action is safe. Instead, it evaluates the requested capability, tenant context, role, approval metadata, amount boundary, and prompt-safety findings before allowing execution.
+
+## Security model
+
+ClawKeeper is built for financial workloads where the agent cannot be treated as an unrestricted chatbot. The v1.5 security model adds an explicit control plane around agent execution and documents the operating boundary in [`docs/SECURITY_MODEL.md`](docs/SECURITY_MODEL.md).
+
+| Guardrail | v1.5 behavior |
+|---|---|
+| **Tenant boundary** | Agents may not act across tenants unless the request comes from a platform-level context explicitly allowed by policy. |
+| **Capability boundary** | Every finance action is checked against the tenant/user capability set before execution. |
+| **Approval boundary** | Payment processing, accounting-system writes, tax workflows, and high-risk operations require approval metadata. |
+| **Prompt-safety boundary** | Prompt-injection and guardrail-bypass phrases are denied before execution. |
+| **Audit boundary** | Policy decisions are captured as audit events with PII and secrets redacted before persistence. |
+| **Integration boundary** | External systems remain behind typed clients and policy-gated agent tasks. |
+
+Security documentation is split between the operational model in [`SECURITY.md`](SECURITY.md) and the v1.5 OpenClaw agent boundary in [`docs/SECURITY_MODEL.md`](docs/SECURITY_MODEL.md).
 
 ## Quick Start
 
-> **Detailed setup instructions:** See [STARTUP.md](./STARTUP.md) for troubleshooting and advanced configuration.
-
-### Prerequisites
-
-- **[Bun](https://bun.sh)** >= 1.0.0
-- **PostgreSQL** >= 14
-- **DeepSeek API Key** — [Get one here](https://platform.deepseek.com/api_keys)
-
-### 1. Clone and Install
+ClawKeeper is a Bun-first repository for local development, with Node-compatible test and quality commands for CI. Use Bun for the application runtime and npm for the local quality gate if you are validating in a Node-only environment.
 
 ```bash
 git clone https://github.com/Alexi5000/ClawKeeper.git
 cd ClawKeeper
 bun install
-```
-
-### 2. Configure Environment
-
-```bash
 cp .env.example .env
 ```
 
-Set your `DEEPSEEK_API_KEY` in `.env` (and optionally Plaid, Stripe, QuickBooks, Xero keys).
-
-### 3. Setup Database
+Set the required environment variables in `.env`, then initialize the database and start the services.
 
 ```bash
-# One-command setup (schema + RLS + RBAC + seed data)
 bun run setup:full
-```
-
-Or manually:
-
-```bash
-createdb clawkeeper
-bun run db:setup
-bun run setup:demo
-```
-
-### 4. Start Services
-
-```bash
-# Terminal 1: API Server (default port 9100)
 bun run dev
-
-# Terminal 2: Dashboard (default port 3000)
 bun run dashboard:dev
 ```
 
-### 5. Launch the Command Center
+| Service | Default command | Notes |
+|---|---|---|
+| **API server** | `bun run dev` | Runs the Hono backend and agent-control-plane routes. |
+| **Dashboard** | `bun run dashboard:dev` | Starts the React command center from `dashboard/`. |
+| **Database setup** | `bun run setup:full` | Applies schema, RLS, RBAC, and seed data. |
+| **Validation** | `npm run quality` | Runs typecheck, lint, and tests in the v1.5 quality gate. |
 
-Open [http://localhost:3000](http://localhost:3000) and log in:
+## API surface
 
-| Field | Value |
+The backend exposes the finance operations API and the new OpenClaw control-plane inspection endpoints. The exact route implementations live in `src/api/routes`.
+
+```text
+GET  /health
+POST /api/auth/login
+POST /api/auth/register
+GET  /api/agents
+GET  /api/agents/openclaw/manifest
+POST /api/agents/openclaw/policy/evaluate
+GET  /api/invoices
+POST /api/invoices/upload
+POST /api/reconciliation/start
+GET  /api/reports/:type
+WS   /ws
+```
+
+The OpenClaw policy evaluation endpoint is a **dry-run inspection route**. It is designed for dashboards, tests, and operators to understand whether a proposed agent action would be allowed, approval-gated, or denied before actual execution.
+
+## Testing and quality gates
+
+ClawKeeper v1.5 adds focused tests for the agent infrastructure rather than only testing dashboard behavior. The suite validates the parts of the system that matter most for a finance-agent release: manifest correctness, policy decisions, approval requirements, tenant isolation, prompt-injection denial, and audit redaction.
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run quality
+```
+
+| Test file | Coverage |
 |---|---|
-| Email | `admin@demo.com` |
-| Password | `password123` |
+| `test/openclaw.manifest.test.ts` | OpenClaw app identity, finance-agent registration, high-risk capability policy, and runtime adapter health. |
+| `test/openclaw.policy.test.ts` | Autonomous reporting, approval-required payment flows, approved high-risk actions, tenant isolation denial, missing capability denial, prompt-injection denial, and redaction. |
+| `.github/workflows/quality.yml` | CI install, typecheck, lint, tests, and npm audit. |
 
-Navigate to **Command Center**, type a command like *"Generate monthly P&L report and reconcile all accounts"*, and watch 110 agents go to work.
+## Repository structure
 
----
-
-## Skills
-
-ClawKeeper ships with **8 production-ready skills** that agents use to perform specialized tasks:
-
-| Skill | Description |
-|---|---|
-| `invoice-processor` | OCR extraction, validation, and categorization of invoices |
-| `bank-reconciliation` | Automatic transaction matching and discrepancy detection |
-| `financial-reporting` | P&L, Balance Sheet, Cash Flow, and custom report generation |
-| `payment-gateway` | Payment processing and disbursement via Stripe |
-| `compliance-checker` | Tax compliance validation and audit trail generation |
-| `document-parser` | Multi-format document parsing (PDF, images, spreadsheets) |
-| `data-sync` | Bidirectional sync with QuickBooks and Xero |
-| `audit-trail` | Immutable logging of all financial actions |
-
----
-
-## API Reference
-
-### Authentication
-
-```
-POST /api/auth/login          # User authentication
-POST /api/auth/register       # New user registration
-```
-
-### Invoices
-
-```
-GET    /api/invoices              # List invoices
-POST   /api/invoices/upload       # Upload invoice for AI processing
-POST   /api/invoices/:id/approve  # Approve invoice
-POST   /api/invoices/:id/pay      # Mark as paid
-```
-
-### Reports
-
-```
-GET /api/reports/:type
-```
-
-Supported types: `profit_loss`, `balance_sheet`, `cash_flow`, `ap_aging`, `ar_aging`
-
-### Reconciliation
-
-```
-POST /api/reconciliation/start       # Start reconciliation task
-GET  /api/reconciliation/:id/status  # Check reconciliation status
-```
-
-### Real-Time
-
-```
-WS /ws    # WebSocket for live agent execution updates
-```
-
-> Full API documentation: [docs/API.md](./docs/API.md)
-
----
-
-## Security
-
-ClawKeeper is built for production financial workloads with enterprise-grade security:
-
-- **Row-Level Security (RLS)** — Tenant data isolation enforced at the database level
-- **Role-Based Access Control** — 4 roles: `super_admin`, `tenant_admin`, `accountant`, `viewer`
-- **Immutable Audit Trail** — Every financial action is logged and tamper-proof
-- **Rate Limiting** — Per-tenant and per-endpoint rate limits
-- **Circuit Breaker** — Automatic protection for external API failures
-- **Input Validation** — Zod schemas enforce strict typing on all API inputs
-- **PII Detection** — Prevents sensitive data from leaking to LLM providers
-
-> Full security documentation: [SECURITY.md](./SECURITY.md)
-
----
-
-## Project Structure
-
-```
+```text
 ClawKeeper/
-├── agents/                # 110 agent definitions (CEO + orchestrators + workers)
-│   ├── clawkeeper/       # CEO agent
-│   ├── orchestrators/    # 9 team lead agents
-│   └── workers/          # 100 specialized worker agents
-├── skills/                # 8 production-ready skills
 ├── src/
-│   ├── api/              # Hono API server
-│   ├── agents/           # Agent runtime implementations
-│   ├── core/             # Types, orchestrator engine, scheduler
-│   ├── integrations/     # Plaid, Stripe, QuickBooks, Xero, Document AI
-│   ├── memory/           # Agent memory and context system
-│   ├── guardrails/       # Security, validation, PII detection
-│   └── db/               # Database queries and migrations
-├── dashboard/             # React admin dashboard (Vite + Tailwind + Shadcn)
-├── db/                    # SQL schema, RLS policies, RBAC, seed data
-├── docs/                  # Extended documentation
-├── config/                # Configuration files
-└── scripts/               # Deployment and utility scripts
+│   ├── agents/          # CEO, orchestrator, worker, and base execution classes
+│   ├── api/             # Hono server and finance/control-plane routes
+│   ├── core/            # Shared types, LLM client, observability, scheduling
+│   ├── guardrails/      # Validation, PII detection, injection checks, audit helpers
+│   ├── integrations/    # Plaid, Stripe, QuickBooks, Xero, Document AI clients
+│   ├── memory/          # Agent memory and context primitives
+│   └── openclaw/        # v1.5 manifest, policy engine, runtime adapter
+├── test/                # OpenClaw manifest, runtime, and policy tests
+├── dashboard/           # React command center
+├── db/                  # PostgreSQL schema, RLS, RBAC, and seed data
+├── docs/                # Architecture, security model, API, release, deployment docs
+├── agents/              # Agent definitions and worker summaries
+├── skills/              # Finance skill definitions
+└── .github/workflows/   # CI quality gate
 ```
-
----
 
 ## Documentation
 
-| Document | Description |
+| Document | What it explains |
 |---|---|
-| [STARTUP.md](./STARTUP.md) | Detailed startup guide with troubleshooting |
-| [Architecture](./docs/ARCHITECTURE.md) | System design and agent hierarchy |
-| [API Reference](./docs/API.md) | Complete API documentation |
-| [Deployment Guide](./docs/DEPLOYMENT.md) | Production deployment instructions |
-| [Multi-Tenancy](./docs/MULTI-TENANCY.md) | Tenant isolation and RBAC configuration |
-| [Security](./SECURITY.md) | Security model and best practices |
-| [Contributing](./CONTRIBUTING.md) | Contribution guidelines |
-
----
-
-## Development
-
-### Adding a New Agent
-
-1. Create the agent definition: `agents/<category>/<name>/AGENT.md`
-2. Implement the runtime: `src/agents/<name>.ts`
-3. Register in `src/agents/index.ts`
-4. Deploy: `./scripts/deploy.sh`
-
-### Adding a New Skill
-
-1. Create the skill definition: `skills/<name>/SKILL.md`
-2. Update the skills index: `SKILLS.md`
-3. Deploy: `./scripts/deploy.sh`
-
-### Testing
-
-```bash
-bun test              # Run all tests
-bun run typecheck     # TypeScript type checking
-bun run lint          # ESLint
-```
-
----
+| [`docs/RELEASE_1_5.md`](docs/RELEASE_1_5.md) | v1.5 release notes, implementation highlights, and validation evidence. |
+| [`docs/SECURITY_MODEL.md`](docs/SECURITY_MODEL.md) | OpenClaw agent boundary, approval gates, and finance guardrails. |
+| [`docs/V1_5_ARCHITECTURE_ASSESSMENT.md`](docs/V1_5_ARCHITECTURE_ASSESSMENT.md) | Baseline maturity assessment that informed v1.5. |
+| [`docs/V1_5_IMPLEMENTATION_SCOPE.md`](docs/V1_5_IMPLEMENTATION_SCOPE.md) | Concrete v1.5 scope derived from ClawKeeper gaps and OpenClaw patterns. |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | System architecture and agent hierarchy. |
+| [`docs/API.md`](docs/API.md) | API reference. |
+| [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Deployment guidance. |
+| [`docs/MULTI-TENANCY.md`](docs/MULTI-TENANCY.md) | Tenant isolation and RBAC model. |
+| [`SECURITY.md`](SECURITY.md) | Security policy and operational security notes. |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution workflow. |
 
 ## Roadmap
 
-- [ ] Multi-currency support
-- [ ] AI-powered cash flow forecasting
-- [ ] Automated tax filing preparation
-- [ ] Mobile companion app
-- [ ] Slack/Teams integration for notifications
-- [ ] Custom agent builder UI
+v1.5 establishes the agent-control-plane foundation. The next milestones should deepen OpenClaw runtime execution, add policy-backed approval UX in the dashboard, expand integration writeback tests, and move from dry-run policy inspection to full operator-reviewed execution queues for money movement and accounting mutations.
 
----
+| Milestone | Direction |
+|---|---|
+| **v1.6 Approval Workbench** | Human approval queue, reviewer comments, immutable approval evidence, and dashboard controls for high-risk actions. |
+| **v1.7 Integration Hardening** | Contract tests around Plaid, Stripe, QuickBooks, Xero, and document-processing adapters. |
+| **v1.8 OpenClaw Runtime Expansion** | Deeper gateway integration, distributed agent scheduling, tool sandboxing, and execution replay. |
+| **v2.0 Finance Autopilot** | End-to-end SMB finance workflows that combine approvals, reconciliation, reporting, and accounting-system writeback. |
 
 ## License
 
-MIT — see [LICENSE](./LICENSE) for details.
+ClawKeeper is released under the MIT License. See [`LICENSE`](LICENSE) for details.
 
 ---
 
 <div align="center">
 
-**Built by [Alex Cinovoj](https://github.com/Alexi5000) · Powered by [TechTide AI](https://github.com/Alexi5000/TechTideAI2)**
+**Built by [Alex Cinovoj](https://github.com/Alexi5000) · OpenClaw-native SMB finance agents**
 
-*Stop doing bookkeeping. Start building your business.*
+*Run the finance arm of the business on agents, not spreadsheets.*
 
 </div>

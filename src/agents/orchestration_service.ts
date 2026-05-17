@@ -5,7 +5,8 @@
 import { v4 as uuid } from 'uuid';
 import { agent_runtime } from './index';
 import * as llm from '../core/llm-client';
-import type { LedgerTaskStar, LedgerCapability, LedgerAgentId, TenantContext } from '../core/types';
+import type { LedgerTaskStar, LedgerCapability, LedgerAgentId } from '../core/types';
+import type { TenantContext } from './base';
 
 // ============================================================================
 // Types
@@ -248,7 +249,7 @@ class OrchestrationService {
           task.completed_at = new Date().toISOString();
           task.duration_ms = task_duration;
           task.result = result.output;
-          task.error = result.error;
+          task.error = result.error ?? undefined;
 
           results.push({
             task_id: task.task_id,

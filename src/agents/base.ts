@@ -19,6 +19,12 @@ import {
   start_agent_span,
   record_agent_result,
 } from '../core/observability';
+import {
+  assert_agent_policy_allows,
+  evaluate_agent_policy,
+  redact_policy_payload,
+  type AgentPolicyDecision,
+} from '../openclaw/policy';
 
 export interface AgentConfig {
   id: LedgerAgentId;
@@ -37,6 +43,7 @@ export interface TaskResult {
   agent_id: LedgerAgentId;
   tokens_used?: number;
   cost?: number;
+  policy_decision?: AgentPolicyDecision;
 }
 
 export interface TenantContext {
@@ -139,20 +146,27 @@ export abstract class BaseAgent {
     });
 
     try {
-      // Validate capabilities
-      const missing_caps = task.required_capabilities.filter(
-        cap => !this.config.capabilities.includes(cap)
-      );
-      if (missing_caps.length > 0) {
-        throw new Error(`Missing capabilities: ${missing_caps.join(', ')}`);
-      }
+      // OpenClaw v1.5 policy boundary: validate tenant scope, capability grants,
+      // prompt-injection signals, PII handling, financial risk, and approval state
+      // before any agent can call tools or mutate financial data.
+      const policy_decision = evaluate_agent_policy({
+        task,
+        tenant_context,
+        agent_capabilities: this.config.capabilities,
+        approval_id: typeof task.parameters?.approval_id === 'string' ? task.parameters.approval_id : null,
+        request_id: typeof task.parameters?.request_id === 'string' ? task.parameters.request_id : null,
+      });
 
-      // Validate tenant access
-      if (task.tenant_id !== tenant_context.tenant_id && tenant_context.user_role !== 'super_admin') {
-        throw new Error('Tenant isolation violation');
-      }
+      await this.log_audit({
+        action: 'agent_policy_decision',
+        entity_type: 'agent_policy_decisions',
+        entity_id: task.id,
+        details: redact_policy_payload(policy_decision.audit_event) as Record<string, unknown>,
+      });
 
-      // Execute the task
+      assert_agent_policy_allows(policy_decision);
+
+      // Execute the task only after OpenClaw policy permits it.
       const output = await this.execute(task);
 
       const duration_ms = Date.now() - start_time;
@@ -179,6 +193,7 @@ export abstract class BaseAgent {
         error: null,
         duration_ms,
         agent_id: this.config.id,
+        policy_decision,
       };
 
     } catch (error) {

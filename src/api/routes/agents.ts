@@ -11,6 +11,11 @@ import type { ExecutionEvent } from '../../agents/orchestration_service';
 import type { AppEnv } from '../../types/hono';
 import type { LedgerTaskStar } from '../../core/types';
 import { get_agent_templates } from '../../agents/task_templates';
+import {
+  CLAWKEEPER_OPENCLAW_MANIFEST,
+  evaluate_agent_policy,
+  get_openclaw_agent_definition,
+} from '../../openclaw';
 
 export function agent_routes(sql: Sql<Record<string, unknown>>) {
   const app = new Hono<AppEnv>();
@@ -50,6 +55,59 @@ export function agent_routes(sql: Sql<Record<string, unknown>>) {
     });
   });
 
+  // OpenClaw-native application manifest for ClawKeeper v1.5
+  app.get('/openclaw/manifest', async (c) => {
+    return c.json({ manifest: CLAWKEEPER_OPENCLAW_MANIFEST });
+  });
+
+  // Dry-run an agent policy decision without executing the task.
+  app.post('/openclaw/policy/evaluate', async (c) => {
+    const tenant_id = c.get('tenant_id');
+    const user_id = c.get('user_id');
+    const user_role = c.get('user_role') || 'tenant_admin';
+
+    if (!tenant_id || !user_id) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    try {
+      const { agent_id = 'clawkeeper', task_name, description, required_capabilities = [], input = {}, parameters = {}, priority = 'normal', approval_id = null } = await c.req.json();
+      const agent_definition = get_openclaw_agent_definition(agent_id);
+      const task: LedgerTaskStar = {
+        id: crypto.randomUUID(),
+        tenant_id,
+        name: task_name || 'policy dry run',
+        description: description || 'Dry-run policy evaluation for a ClawKeeper OpenClaw agent task.',
+        required_capabilities,
+        assigned_agent: agent_id,
+        status: 'assigned',
+        priority,
+        input,
+        output: null,
+        parameters: { ...parameters, approval_id },
+        dependencies: [],
+        created_at: new Date().toISOString(),
+        started_at: null,
+        completed_at: null,
+        error: null,
+        retry_count: 0,
+        max_retries: 3,
+      };
+
+      const decision = evaluate_agent_policy({
+        task,
+        tenant_context: { tenant_id, user_id, user_role },
+        agent_capabilities: agent_definition?.capabilities ?? [],
+        approval_id,
+      });
+
+      return c.json({ decision });
+    } catch (error: any) {
+      console.error('Policy evaluation error:', error);
+      return c.json({ error: 'Failed to evaluate policy', message: error.message }, 400);
+    }
+  });
+
   // Get specific agent status
   app.get('/:id/status', async (c) => {
     const agent_id = c.req.param('id') as any;
@@ -76,7 +134,7 @@ export function agent_routes(sql: Sql<Record<string, unknown>>) {
     }
 
     try {
-      const { task_name, description, parameters, priority } = await c.req.json();
+      const { task_name, description, parameters, priority, required_capabilities = [] } = await c.req.json();
 
       // Build task object
       const task: LedgerTaskStar = {
@@ -84,7 +142,7 @@ export function agent_routes(sql: Sql<Record<string, unknown>>) {
         tenant_id,
         name: task_name,
         description,
-        required_capabilities: [],
+        required_capabilities,
         assigned_agent: agent_id,
         status: 'assigned',
         priority: priority || 'normal',
