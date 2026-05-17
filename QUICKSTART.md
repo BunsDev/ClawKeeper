@@ -100,12 +100,13 @@ PORT=9100
 JWT_SECRET=your-secret-key-change-in-production
 JWT_EXPIRES_IN=7d
 
-# DeepSeek API (Required for AI features)
-DEEPSEEK_API_KEY=sk-your-key-here
-DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
+# OpenAI-compatible LLM provider (Required for AI features)
+AI_PROVIDER=openai-compatible
+OPENAI_API_KEY=sk-your-key-here
+OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
-**Get your DeepSeek API key**: https://platform.deepseek.com/api_keys
+**Configure your OpenAI-compatible provider** by setting `OPENAI_API_KEY` and, when using a non-default gateway, `OPENAI_BASE_URL`.
 
 ## 🚀 Running the Application
 
