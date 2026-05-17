@@ -12,9 +12,9 @@
 [![Version](https://img.shields.io/badge/release-v1.5.0-16a34a)](docs/RELEASE_1_5.md)
 [![OpenClaw Native](https://img.shields.io/badge/OpenClaw-native-16a34a)](https://github.com/openclaw/openclaw)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178c6?logo=typescript)](https://www.typescriptlang.org/)
-[![Quality Gate](https://img.shields.io/badge/quality-typecheck%20%7C%20lint%20%7C%20test-16a34a)](.github/workflows/quality.yml)
+[![Quality Gate](https://img.shields.io/badge/quality-typecheck%20%7C%20lint%20%7C%20test-16a34a)](#testing-and-quality-gates)
 
-[Quick Start](#quick-start) · [Agent Architecture](#agent-architecture) · [Security Model](#security-model) · [Testing](#testing-and-quality-gates) · [API](#api-surface) · [Docs](#documentation)
+[Quick Start](#quick-start) · [Agent Architecture](#what-clawkeeper-runs) · [Security Model](#security-model) · [Testing](#testing-and-quality-gates) · [API](#api-surface) · [Docs](#documentation)
 
 ---
 
@@ -35,7 +35,7 @@ Most SMB finance teams do not need another dashboard; they need the work to happ
 | **Finance safety** | Money movement, accounting-system writes, tax workflows, and destructive actions are approval-gated or denied when capability, tenant, or prompt-safety checks fail. |
 | **Backend surface** | Agent API routes expose manifest and dry-run policy evaluation endpoints for inspecting the control plane before execution. |
 | **Testing** | Node-compatible TypeScript tests cover manifest integrity, runtime adapter health, approvals, tenant isolation, missing capabilities, prompt-injection denial, and audit redaction. |
-| **Quality gate** | `npm run quality` runs TypeScript checking, ESLint, and the v1.5 test suite; CI mirrors the same checks and adds `npm audit`. |
+| **Quality gate** | `npm run quality` runs TypeScript checking, ESLint, and the v1.5 test suite; `docs/templates/quality.workflow.yml` provides the GitHub Actions workflow template with `npm audit`. |
 
 ## What ClawKeeper runs
 
@@ -63,7 +63,7 @@ ClawKeeper CEO Agent
 | **Persistence** | PostgreSQL schema, RLS, RBAC, seed data, and tenant-aware backend types. |
 | **AI provider path** | OpenAI-compatible LLM client abstraction with cost-sensitive configuration and prompt-safety guardrails. |
 | **Finance integrations** | Plaid, Stripe, QuickBooks, Xero, and document-processing integration clients. |
-| **Security controls** | Zod validation, PII detection, prompt-injection detection, rate limiting, audit logging, tenant isolation, approval gates, and CI checks. |
+| **Security controls** | Zod validation, PII detection, prompt-injection detection, rate limiting, audit logging, tenant isolation, approval gates, and local/CI-ready quality checks. |
 
 ## OpenClaw-native v1.5 control plane
 
@@ -155,7 +155,7 @@ npm run quality
 |---|---|
 | `test/openclaw.manifest.test.ts` | OpenClaw app identity, finance-agent registration, high-risk capability policy, and runtime adapter health. |
 | `test/openclaw.policy.test.ts` | Autonomous reporting, approval-required payment flows, approved high-risk actions, tenant isolation denial, missing capability denial, prompt-injection denial, and redaction. |
-| `.github/workflows/quality.yml` | CI install, typecheck, lint, tests, and npm audit. |
+| `docs/templates/quality.workflow.yml` | GitHub Actions template for install, typecheck, lint, tests, and npm audit. |
 
 ## Repository structure
 
@@ -175,7 +175,7 @@ ClawKeeper/
 ├── docs/                # Architecture, security model, API, release, deployment docs
 ├── agents/              # Agent definitions and worker summaries
 ├── skills/              # Finance skill definitions
-└── .github/workflows/   # CI quality gate
+└── docs/templates/      # CI-ready quality workflow template
 ```
 
 ## Documentation

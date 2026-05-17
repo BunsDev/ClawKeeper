@@ -15,7 +15,7 @@ ClawKeeper v1.5.0 is the repository maturity release that moves the project from
 | **Control-plane API** | Extended `src/api/routes/agents.ts` with OpenClaw manifest inspection and dry-run policy evaluation endpoints. |
 | **Security model** | Added `docs/SECURITY_MODEL.md`, documenting the OpenClaw boundary, approval gates, prompt-injection handling, tenant isolation, and audit strategy. |
 | **Testing** | Added focused tests for manifest integrity, runtime health, approval-required actions, tenant isolation denial, missing capability denial, prompt-injection denial, and redaction. |
-| **Quality gates** | Updated scripts and CI so `npm run quality` performs TypeScript checking, ESLint, and tests; CI also runs `npm audit`. |
+| **Quality gates** | Updated scripts so `npm run quality` performs TypeScript checking, ESLint, and tests; added `docs/templates/quality.workflow.yml` as a CI-ready workflow template that also runs `npm audit`. |
 | **Repository narrative** | Rewrote `README.md` around the OpenClaw-native SMB finance-agent platform positioning. |
 
 ## Backend agent infrastructure
@@ -48,7 +48,7 @@ npm test
 npm run quality
 ```
 
-The local v1.5 quality gate completed with **0 errors** and **11 passing tests**. ESLint currently reports warnings for legacy unused symbols in the broader repository, but it does not block the gate. Those warnings are retained as visible cleanup opportunities rather than hidden.
+The local v1.5 quality gate completed with **0 errors** and **11 passing tests**, and `npm audit --audit-level=high` completed with **0 vulnerabilities**. The GitHub Actions workflow is included as `docs/templates/quality.workflow.yml` so it can be promoted into `.github/workflows/quality.yml` by a token or maintainer account with workflow-write permission.
 
 | Test file | Coverage |
 |---|---|
