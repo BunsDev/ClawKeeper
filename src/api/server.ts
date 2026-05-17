@@ -1,6 +1,6 @@
 // file: src/api/server.ts
 // description: Hono API server for ClawKeeper with multi-tenant support
-// reference: src/api/routes/*.ts, Constellation server pattern
+// reference: src/api/routes/*.ts, orcaflow server pattern
 
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -19,6 +19,8 @@ import { create_activity_routes } from './routes/activity';
 import { create_vendor_routes } from './routes/vendors';
 import { create_customer_routes } from './routes/customers';
 import { create_metrics_routes } from './routes/metrics';
+import { admin_routes } from './routes/admin';
+import { websocket_handler } from './websocket_handler';
 import type { AppEnv } from '../types/hono';
 
 // Database connection
@@ -43,7 +45,7 @@ app.use('/api/*', async (c, next) => {
   
   if (!auth_header || !auth_header.startsWith('Bearer ')) {
     // Skip for public endpoints
-    if (c.req.path === '/api/auth/login' || c.req.path === '/api/health' || c.req.path === '/api/agents/status') {
+    if (c.req.path === '/api/auth/login' || c.req.path === '/api/health' || c.req.path === '/api/agents/status' || c.req.path === '/api/admin/molten-sync') {
       return next();
     }
     
@@ -116,39 +118,23 @@ app.route('/api/activity', create_activity_routes(sql));
 app.route('/api/vendors', create_vendor_routes(sql));
 app.route('/api/customers', create_customer_routes(sql));
 app.route('/api/metrics', create_metrics_routes(sql));
+app.route('/api/admin', admin_routes());
 
-// WebSocket endpoint (NOT IMPLEMENTED)
+// WebSocket endpoint
 app.get('/ws', (c) => {
-  // TODO: Implement WebSocket support for real-time agent updates
+  // Return upgrade info for HTTP GET (browser compatibility)
   return c.json({
-    error: 'WebSocket not yet implemented',
-    message: 'This endpoint will provide real-time agent status updates',
-  }, 501);
+    message: 'WebSocket endpoint ready',
+    usage: 'Upgrade this connection to WebSocket protocol',
+    stats: websocket_handler.get_stats(),
+  });
 });
 
 // Start server
 const port = Number(process.env.PORT) || 4004;
 
-// Validate port configuration
-const EXPECTED_PORT = 9100;
-if (port !== EXPECTED_PORT) {
-  console.error(`
-╔═════════════════════════════════════════════════════════════════╗
-║  ⚠️  PORT CONFIGURATION MISMATCH DETECTED                       ║
-╚═════════════════════════════════════════════════════════════════╝
-
-Expected Port: ${EXPECTED_PORT}
-Current Port:  ${port}
-
-This mismatch will cause the dashboard to fail connecting to the API.
-
-ACTION REQUIRED:
-1. Update your .env file: PORT=${EXPECTED_PORT}
-2. Restart the API server
-
-Continuing with port ${port} anyway, but connections may fail...
-`);
-}
+// Port 4004 is the canonical port per .env.ports
+// Remove obsolete validation against 9100
 
 console.log(`
 ╔═════════════════════════════════════════════════════════════════╗
@@ -170,4 +156,13 @@ Ready for requests...
 export default {
   port,
   fetch: app.fetch,
+  websocket: {
+    open: websocket_handler.open.bind(websocket_handler),
+    message: websocket_handler.message.bind(websocket_handler),
+    close: websocket_handler.close.bind(websocket_handler),
+    error: websocket_handler.error.bind(websocket_handler),
+  },
 };
+
+// Export websocket handler for use in agents
+export { websocket_handler, emit_agent_status } from './websocket_handler';

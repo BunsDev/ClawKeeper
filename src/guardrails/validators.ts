@@ -20,6 +20,7 @@ export function detect_pii(text: string): { has_pii: boolean; types: string[] } 
   const found_types: string[] = [];
 
   for (const [type, pattern] of Object.entries(PII_PATTERNS)) {
+    pattern.lastIndex = 0;
     if (pattern.test(text)) {
       found_types.push(type);
     }
