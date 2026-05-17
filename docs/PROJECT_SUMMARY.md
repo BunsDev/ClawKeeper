@@ -1,11 +1,14 @@
 # ClawKeeper Project Summary
 
+
+> **v1.5 summary context:** This summary reflects the current OpenClaw-native SMB finance-agent platform direction: ClawKeeper operates the finance arm of an SMB through TypeScript agents, deterministic policy guardrails, tenant isolation, and auditable approval gates.
+
 ## Executive Overview
 
-ClawKeeper is a production-ready, multi-tenant AI agent system for autonomous bookkeeping automation targeting SMBs and freelancers.
+ClawKeeper is a production-ready, multi-tenant AI agent system for OpenClaw-native SMB finance-agent operations.
 
 **Built**: February 2, 2026
-**Status**: ✅ Foundation Complete - Ready for Development Testing
+**Status**: ✅ v1.5 OpenClaw-Native Foundation Complete
 **Agent Count**: 110 (1 CEO + 9 Orchestrators + 100 Workers)
 **Lines of Code**: ~5,000+ (estimated)
 

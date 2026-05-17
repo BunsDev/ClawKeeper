@@ -1,5 +1,8 @@
 # Security Policy
 
+
+> **v1.5 security context:** ClawKeeper runs SMB financial operations through OpenClaw-native agents. Security review must prioritize tenant isolation, approval-gated execution, prompt-injection resistance, audit redaction, secrets hygiene, and safe integration boundaries.
+
 ## Reporting Security Vulnerabilities
 
 We take the security of ClawKeeper seriously. If you discover a security vulnerability, please report it responsibly.

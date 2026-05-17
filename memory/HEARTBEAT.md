@@ -1,5 +1,8 @@
 # ClawKeeper Heartbeat Protocol
 
+
+> **v1.5 heartbeat context:** Health checks cover the OpenClaw-native finance-agent control plane, including API responsiveness, agent orchestration, policy evaluation, audit emission, tenant boundaries, and guarded integrations.
+
 ## Purpose
 
 The heartbeat ensures ClawKeeper remains responsive, healthy, and aligned with its mission of precise financial automation.

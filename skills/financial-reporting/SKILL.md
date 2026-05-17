@@ -1,3 +1,5 @@
+> **OpenClaw skill context:** This skill supports ClawKeeper v1.5 as an OpenClaw-native SMB finance-agent platform. Implementations should preserve tenant isolation, deterministic policy enforcement, and auditable financial operations.
+
 ---
 name: financial-reporting
 description: "Generate standard financial reports including P&L, balance sheet, and cash flow statements. Use when creating monthly/quarterly/annual reports, comparing periods, or exporting financial data. Supports GAAP and custom report formats."

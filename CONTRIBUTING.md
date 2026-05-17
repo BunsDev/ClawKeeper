@@ -1,5 +1,8 @@
 # Contributing to ClawKeeper
 
+
+> **v1.5 contributor context:** ClawKeeper is an OpenClaw-native SMB finance-agent platform. Contributions should strengthen TypeScript agent infrastructure, policy guardrails, auditability, and production-grade financial operations rather than repositioning the project as dashboard-first or bookkeeping-only software.
+
 Thank you for your interest in contributing to ClawKeeper! This document provides guidelines and instructions for contributing.
 
 ## Table of Contents

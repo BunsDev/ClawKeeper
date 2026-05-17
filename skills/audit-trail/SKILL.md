@@ -1,3 +1,5 @@
+> **OpenClaw skill context:** This skill supports ClawKeeper v1.5 as an OpenClaw-native SMB finance-agent platform. Implementations should preserve tenant isolation, deterministic policy enforcement, and auditable financial operations.
+
 ---
 name: audit-trail
 description: "Maintain immutable audit log for all financial actions. Use when logging user actions, tracking entity changes, generating audit reports, or investigating compliance issues. Ensures complete accountability and traceability."

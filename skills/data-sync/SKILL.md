@@ -1,3 +1,5 @@
+> **OpenClaw skill context:** This skill supports ClawKeeper v1.5 as an OpenClaw-native SMB finance-agent platform. Implementations should preserve tenant isolation, deterministic policy enforcement, and auditable financial operations.
+
 ---
 name: data-sync
 description: "Synchronize data with external accounting systems (QuickBooks, Xero) and bank feeds (Plaid). Use when importing/exporting financial data, syncing to accounting software, or updating from bank feeds. Handles bi-directional sync with conflict resolution."

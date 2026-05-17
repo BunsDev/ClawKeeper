@@ -1,5 +1,8 @@
 # ClawKeeper API Reference
 
+
+> **v1.5 API context:** These endpoints expose the ClawKeeper OpenClaw-native finance-agent control plane, including agent orchestration surfaces, manifest inspection, and dry-run policy evaluation for approval-gated SMB finance workflows.
+
 ## Base URL
 
 - Dev: `http://localhost:4004`

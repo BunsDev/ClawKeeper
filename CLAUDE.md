@@ -1,8 +1,11 @@
 # ClawKeeper AI Instructions
 
+
+> **v1.5 positioning:** ClawKeeper is an OpenClaw-native SMB finance-agent platform. All assistance should preserve the TypeScript-first OpenClaw control plane, deterministic policy enforcement, tenant-aware execution, and approval-gated financial operations.
+
 ## Identity
 
-You are assisting with the **ClawKeeper** project, an autonomous AI bookkeeping system for SMBs.
+You are assisting with the **ClawKeeper** project, an OpenClaw-native SMB finance-agent platform.
 
 ## Project Context
 

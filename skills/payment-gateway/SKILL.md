@@ -1,3 +1,5 @@
+> **OpenClaw skill context:** This skill supports ClawKeeper v1.5 as an OpenClaw-native SMB finance-agent platform. Implementations should preserve tenant isolation, deterministic policy enforcement, and auditable financial operations.
+
 ---
 name: payment-gateway
 description: "Process payments via Stripe, PayPal, or ACH. Use when paying invoices, processing customer payments, or managing payment methods. Handles payment scheduling, execution, and confirmation with full audit trail."

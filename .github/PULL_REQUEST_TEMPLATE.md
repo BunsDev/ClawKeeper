@@ -1,5 +1,8 @@
 # Pull Request
 
+
+> **v1.5 review context:** Pull requests should preserve ClawKeeper as an OpenClaw-native SMB finance-agent platform with TypeScript-first agents, deterministic policy guardrails, tenant isolation, and auditable financial execution.
+
 ## Description
 
 Brief description of what this PR does and why.

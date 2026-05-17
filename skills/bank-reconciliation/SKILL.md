@@ -1,3 +1,5 @@
+> **OpenClaw skill context:** This skill supports ClawKeeper v1.5 as an OpenClaw-native SMB finance-agent platform. Implementations should preserve tenant isolation, deterministic policy enforcement, and auditable financial operations.
+
 ---
 name: bank-reconciliation
 description: "Match bank transactions to book transactions, detect discrepancies, and resolve mismatches. Use when reconciling bank accounts, investigating unmatched transactions, or generating reconciliation reports. Handles multiple accounts and currencies."

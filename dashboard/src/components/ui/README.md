@@ -1,5 +1,8 @@
 # UI Components
 
+
+> **v1.5 UI context:** UI components support the OpenClaw-native finance-agent operating system. The dashboard is an observability and control surface for agent work, not the product center of gravity.
+
 This directory contains Shadcn UI components for the ClawKeeper dashboard.
 
 ## Currently Used Components

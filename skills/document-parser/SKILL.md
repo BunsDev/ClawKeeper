@@ -1,3 +1,5 @@
+> **OpenClaw skill context:** This skill supports ClawKeeper v1.5 as an OpenClaw-native SMB finance-agent platform. Implementations should preserve tenant isolation, deterministic policy enforcement, and auditable financial operations.
+
 ---
 name: document-parser
 description: "OCR and parse documents including invoices, receipts, and bank statements. Use when extracting text from PDF/images, parsing scanned documents, or processing uploaded files. Supports Google Document AI and Tesseract OCR."

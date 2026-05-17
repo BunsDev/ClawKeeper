@@ -1,5 +1,8 @@
 # ClawKeeper Deployment Guide
 
+
+> **v1.5 deployment context:** Deployments should preserve the OpenClaw-native TypeScript control plane, manifest/policy endpoints, tenant-aware data boundaries, and approval-gated finance-agent execution model.
+
 ## Prerequisites
 
 - **Operating System**: WSL2 (Ubuntu) or Linux

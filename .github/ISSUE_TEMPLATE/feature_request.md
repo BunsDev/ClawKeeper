@@ -8,6 +8,9 @@ assignees: ''
 
 ## Feature Summary
 
+
+> **v1.5 feature context:** Feature requests should strengthen the OpenClaw-native SMB finance-agent platform and avoid reframing ClawKeeper as dashboard-first or bookkeeping-only software.
+
 A clear and concise description of what you want to happen.
 
 ## Problem Statement

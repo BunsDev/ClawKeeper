@@ -1,3 +1,5 @@
+> **OpenClaw skill context:** This skill supports ClawKeeper v1.5 as an OpenClaw-native SMB finance-agent platform. Implementations should preserve tenant isolation, deterministic policy enforcement, and auditable financial operations.
+
 ---
 name: invoice-processor
 description: "Parse, validate, and categorize invoices using OCR and LLM. Use when processing uploaded invoices, extracting invoice data, validating invoice fields, or categorizing expenses. Handles PDF, image, and scanned invoices with intelligent field extraction."

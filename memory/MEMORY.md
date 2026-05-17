@@ -1,10 +1,13 @@
 # ClawKeeper Long-Term Memory
 
+
+> **v1.5 memory context:** Durable operational memory should reinforce OpenClaw-native finance-agent execution, tenant isolation, policy-controlled approvals, and auditable SMB financial workflows.
+
 ## System Knowledge
 
 ### Financial Workflows
 
-I have learned that typical SMB bookkeeping involves:
+I have learned that typical SMB financial operations involve:
 1. **Invoice Processing** - 20-50 invoices per month for most SMBs
 2. **Bank Reconciliation** - Monthly reconciliation critical for accuracy
 3. **Financial Reports** - Monthly P&L for management, quarterly for board/investors

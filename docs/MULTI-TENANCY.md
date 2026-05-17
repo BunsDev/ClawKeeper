@@ -1,5 +1,8 @@
 # ClawKeeper Multi-Tenancy Guide
 
+
+> **v1.5 tenancy context:** Multi-tenancy in ClawKeeper protects OpenClaw-native finance-agent execution, not only dashboard data. Every policy decision, audit event, integration action, and financial workflow must remain tenant-scoped.
+
 ## Overview
 
 ClawKeeper is designed as a multi-tenant SaaS platform where each tenant's data is completely isolated from other tenants.

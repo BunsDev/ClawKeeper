@@ -1,5 +1,8 @@
 # ClawKeeper Build Verification
 
+
+> **v1.5 verification context:** Verification now focuses on the OpenClaw-native control plane, TypeScript quality gates, deterministic policy enforcement, manifest integrity, and safe SMB finance-agent execution.
+
 Generated: 2026-02-02
 
 ## Build Summary
@@ -214,9 +217,9 @@ Total Files Created: **191**
 ### Current Implementation
 
 1. **WebSocket** - Endpoint defined but not fully implemented
-2. **File Upload** - Invoice upload returns placeholder (OCR integration pending)
+2. **File Upload** - Invoice upload returns integration seam documented for OpenClaw-native expansion
 3. **Worker Agents** - Only AP Lead fully implemented, others are stubs
-4. **External Integrations** - Plaid/Stripe/QuickBooks return placeholders
+4. **External Integrations** - Plaid/Stripe/QuickBooks are modeled as guarded integration seams pending production credentials
 5. **Payment Processing** - Updates DB but doesn't call actual gateway yet
 
 ### Future Implementation

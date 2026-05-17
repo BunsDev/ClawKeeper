@@ -8,6 +8,9 @@ assignees: ''
 
 ## Bug Description
 
+
+> **v1.5 issue context:** Bugs should be described against the OpenClaw-native SMB finance-agent platform, including affected agent, policy, tenant, integration, or audit surface where applicable.
+
 A clear and concise description of what the bug is.
 
 ## Steps to Reproduce
@@ -31,7 +34,7 @@ If applicable, add screenshots to help explain your problem.
 
 ## Environment
 
-**ClawKeeper Version**: [e.g. 0.1.0]
+**ClawKeeper Version**: [e.g. 1.5.0]
 
 **Deployment**:
 - [ ] Development (local)

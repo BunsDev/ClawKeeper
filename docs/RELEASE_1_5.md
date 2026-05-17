@@ -1,6 +1,6 @@
 # ClawKeeper v1.5.0 Release Notes
 
-ClawKeeper v1.5.0 is the repository maturity release that moves the project from an AI bookkeeping dashboard toward an **OpenClaw-native SMB finance agent platform**. The release focuses on backend agent infrastructure, deterministic safety policy, test coverage, repository quality gates, and documentation that accurately describes how the system should be operated.
+ClawKeeper v1.5.0 is the repository maturity release that establishes the project as an **OpenClaw-native SMB finance-agent platform**. The release focuses on backend agent infrastructure, deterministic safety policy, test coverage, repository quality gates, and documentation that accurately describes how the system should be operated.
 
 > **Release theme:** ClawKeeper is now framed and implemented as an OpenClaw finance-agent application: a small-business financial operation run by agents, with policy gates around money movement, books-of-record changes, tenant boundaries, and auditability.
 

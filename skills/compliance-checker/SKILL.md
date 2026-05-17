@@ -1,3 +1,5 @@
+> **OpenClaw skill context:** This skill supports ClawKeeper v1.5 as an OpenClaw-native SMB finance-agent platform. Implementations should preserve tenant isolation, deterministic policy enforcement, and auditable financial operations.
+
 ---
 name: compliance-checker
 description: "Validate tax compliance, audit readiness, and policy enforcement. Use when checking transactions for compliance violations, preparing for audits, or enforcing financial policies. Ensures regulatory requirements are met."

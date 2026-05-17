@@ -6,7 +6,7 @@
 
 ### The OpenClaw-native finance operating system for SMBs
 
-**ClawKeeper turns the finance arm of a small business into an agent-run operation: invoices, reconciliation, reporting, compliance, integrations, and payment workflows coordinated through an OpenClaw-style agent control plane.**
+**ClawKeeper turns the finance arm of a small business into an agent-run operation: invoices, reconciliation, reporting, compliance, integrations, and payment workflows coordinated through an OpenClaw-native agent control plane.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/release-v1.5.0-16a34a)](docs/RELEASE_1_5.md)
@@ -18,15 +18,15 @@
 
 ---
 
-<img src="assets/cover.png" alt="ClawKeeper Dashboard" width="100%" />
+<img src="assets/cover.png" alt="ClawKeeper OpenClaw-native finance-agent control surface" width="100%" />
 
 </div>
 
 ## Why ClawKeeper exists
 
-Most SMB finance teams do not need another dashboard; they need the work to happen. ClawKeeper is built around that premise. The product is a **full-stack agent application** where a CEO finance agent coordinates domain leads and specialized workers across accounts payable, accounts receivable, reconciliation, reporting, compliance, integrations, ETL, and support. The dashboard remains important, but the center of gravity in v1.5 is the backend agent infrastructure: deterministic policy checks, auditable execution, tenant-aware boundaries, and an OpenClaw-native manifest that defines how finance agents are allowed to operate.
+Most SMB finance teams do not need a static dashboard; they need the work to happen. ClawKeeper is built around that premise. The product is a **full-stack agent application** where a CEO finance agent coordinates domain leads and specialized workers across accounts payable, accounts receivable, reconciliation, reporting, compliance, integrations, ETL, and support. The dashboard remains important, but the center of gravity in v1.5 is the backend agent infrastructure: deterministic policy checks, auditable execution, tenant-aware boundaries, and an OpenClaw-native manifest that defines how finance agents are allowed to operate.
 
-> ClawKeeper v1.5 is the transition from “AI bookkeeping dashboard” to **OpenClaw agent infrastructure for SMB financial operations**.
+> ClawKeeper v1.5 establishes **OpenClaw-native agent infrastructure for SMB financial operations**.
 
 | Repository maturity axis | v1.5 state |
 |---|---|

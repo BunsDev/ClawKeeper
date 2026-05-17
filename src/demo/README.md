@@ -1,5 +1,8 @@
 # ClawKeeper Demo Data
 
+
+> **v1.5 demo context:** Demo data exists to validate OpenClaw-native SMB finance-agent workflows, policy dry-runs, tenant isolation, audit trails, and integration seams without exposing real customer information.
+
 This directory contains tools and data for generating realistic demo/seed data for ClawKeeper development and testing.
 
 ## Purpose
